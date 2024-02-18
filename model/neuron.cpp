@@ -23,7 +23,7 @@ class neuron
     {
         float c = charges;
         charges = 0;
-        return c;
+        return c + bias;
     }
     
     float fire()

@@ -12,10 +12,12 @@ class model
     };
     
     vector<vector<neurons>> structure;
+    vector<int> size;
     
     model(int inputS, vector<int> hiddenS, int outputS)
     {
         createStructure(inputS, hiddenS, outputS);
+        size.clear(); size.push_back(inputS); for(int s : hiddenS) { size.push_back(s); }; size.push_back(outputS);
     }
     
     // structure -----
@@ -31,14 +33,38 @@ class model
     
     // input -----
     
+    int input(int i)
+    {
+        return input({i});
+    }
+    
+    int input(vector<int> i)
+    {
+        return postprocess(input(preprocess(i)));
+    }
+    
     vector<float> input(vector<float> input)
     {
         return feedForward(input);
     }
     
-    void train(vector<float> input, vector<float> expected)
+    // train
+    
+    int train(int i, int e)
+    {
+        return train({i}, {e});
+    }
+    
+    int train(vector<int> i, vector<int> e)
+    {
+        return postprocess(train(preprocess(i), preprocess(e)));
+    }
+    
+    vector<float> train(vector<float> input, vector<float> expected)
     {
         vector<float> output = this->input(input);
+        // backprop lossF gradiantD
+        return output;
     }
     
     
@@ -101,5 +127,19 @@ class model
         for(neurons& nrs : structure.back()) { output.push_back(nrs.neuron.discharge()); }
         return output;
     }
+    
+    // processing
+    
+    vector<float> preprocess(vector<int> indexes)
+    {
+        int size = structure[0].size();
+        vector<float> output(size, 0);
+        for(int index : indexes) { if(index < size && index >= 0) output[index] = 1; }
+        return output;
+    }
+    
+    int postprocess(vector<float> output)
+    {
+        return *max_element(output.begin(), output.end());
+    }
 };
-

@@ -9,14 +9,22 @@ struct s
     int b = 20;
 };
 
+void test(vector<int> a)
+{
+    for(int b : a)
+    {
+        cout << b << endl;
+    }
+}
+
 int main()
 {
-    vector<int> a{10, 20, 30};
-    vector<int>* b = &a;
-    (*b)[0] = 20;
-    cout << a[0];
+    vector<int> a{10,20};
+    cout << a.size();
     return 0;
 }
+
+
 
 /*
 int s(int size[])

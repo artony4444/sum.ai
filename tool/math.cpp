@@ -1,6 +1,4 @@
-
-
-// ----- Functions ----- //
+// ----- random ----- //
 
 #include <stdlib.h> // rand()
 #include <time.h>   // time(NULL)
@@ -14,3 +12,15 @@ float random_float(int depth = 1000)
 {
     return (double) (rand() % depth) / depth;
 }
+
+// ----- functions ----- //
+
+class functions
+{
+    public:
+    
+    static void sigmoid()
+    {
+        cout << "hello i am sigmoid." << endl;
+    }
+};
