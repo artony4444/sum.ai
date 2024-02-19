@@ -5,12 +5,12 @@
 ##
 ## Features
 
-#### (+) added
+#### 👍 added
 + structure generation
 + forward propagation
 
   
-#### (-) to add
+#### 🎯 to add
 - activation functions
 - backpropagation
 - loss function
@@ -20,17 +20,17 @@
 ##
 ## files
 ```
-c++
+📁 src
 |
-|-- model
+|-- 📁 model
 |
-|    model       :    neurons, paths
-|    neuron      :    bias, charges
-|    path        :    weights, charges
+|    📄 model       :    neurons, paths
+|    📄 neuron      :    bias, charges
+|    📄 path        :    weights, charges
 |
 |
-|-- tool
+|-- 📁 tool
 |
-|    math        :    besic maths & helper codes
+|    📄 math        :    besic maths & helper codes
 |
 ```
