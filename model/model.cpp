@@ -12,12 +12,10 @@ class model
     };
     
     vector<vector<neurons>> structure;
-    vector<int> size;
     
     model(int inputS, vector<int> hiddenS, int outputS)
     {
         createStructure(inputS, hiddenS, outputS);
-        size.clear(); size.push_back(inputS); for(int s : hiddenS) { size.push_back(s); }; size.push_back(outputS);
     }
     
     // structure -----
@@ -35,7 +33,7 @@ class model
     
     int input(int i)
     {
-        return input({i});
+        return input(vectorize(i));
     }
     
     int input(vector<int> i)
@@ -45,14 +43,14 @@ class model
     
     vector<float> input(vector<float> input)
     {
-        return feedForward(input);
+        return forwardprop(input);
     }
     
-    // train
+    // train -----
     
     int train(int i, int e)
     {
-        return train({i}, {e});
+        return train(vectorize(i), vectorize(e));
     }
     
     int train(vector<int> i, vector<int> e)
@@ -68,10 +66,10 @@ class model
     }
     
     
-    ////////// helper //////////
+    // ---------- helper ---------- //
     
     
-    // structure
+    // structure -----
     
     vector<neurons> createLayer(int size, string name) { return *new vector<neurons>(size, {*new neuron(name)} ); }
     
@@ -95,9 +93,9 @@ class model
         }
     }
     
-    // feed forward
+    // forwardprop -----
     
-    vector<float> feedForward(vector<float> input)
+    vector<float> forwardprop(vector<float> input)
     {
         charge(input);
         fire();
@@ -128,7 +126,7 @@ class model
         return output;
     }
     
-    // processing
+    // processing -----
     
     vector<float> preprocess(vector<int> indexes)
     {
@@ -140,6 +138,9 @@ class model
     
     int postprocess(vector<float> output)
     {
-        return *max_element(output.begin(), output.end());
+        int len = output.size();
+        int maxIndex = 0;
+        for(int i = 0; i < len; i++) { if(output[i] > output[maxIndex]) { maxIndex = i; } }
+        return maxIndex;
     }
 };

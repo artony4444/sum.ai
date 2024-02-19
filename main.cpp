@@ -1,3 +1,5 @@
+
+
 #include <iostream>
 #include <vector>
 using namespace std;
@@ -13,8 +15,12 @@ int main()
     
     int size = 10;
     
-    model m(size, *new vector<int>{size}, size);
-    vector<float> output = m.input(*new vector<float>(size, 1));
-    for(float elem : output) { cout << elem << endl; }
+    model m(size, {size}, size);
     
+    for(int a = 0; a < 10; a++)
+    {
+        int in = random_float() * size;
+        int out = m.train(in, in);
+        cout << in << " > " << out << endl;
+    }
 }

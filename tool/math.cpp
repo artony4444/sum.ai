@@ -24,3 +24,7 @@ class functions
         cout << "hello i am sigmoid." << endl;
     }
 };
+
+// ----- helper ----- //
+
+vector<int> vectorize(int e) { return *new vector<int>{e}; }
