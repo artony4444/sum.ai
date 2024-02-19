@@ -1,6 +1,7 @@
 # (Σ) sum ai
 > Contact me -<br> [artony4444@gmail.com](mailto:artony4444@gmail.com)
 
+
 ##
 ## Features
 
@@ -15,11 +16,6 @@
 - loss function
 - optimizer
 
-
-##
-## Import
-
-⚠️ UNDER DEVELOPMENT
 
 ##
 ## files
