@@ -4,14 +4,7 @@ class model
 {
     public:
     
-    struct neurons
-    {
-        neuron neuron;
-        vector<path> pathIn;
-        vector<path> pathOut;
-    };
-    
-    vector<vector<neurons>> structure;
+    vector<vector<neuron>> structure;
     
     model(int inputS, vector<int> hiddenS, int outputS)
     {
@@ -71,7 +64,7 @@ class model
     
     // structure -----
     
-    vector<neurons> createLayer(int size, string name) { return *new vector<neurons>(size, {*new neuron(name)} ); }
+    vector<neuron> createLayer(int size, string name) { return *new vector<neuron>(size, *new neuron(name) ); }
     
     void connectDense()
     {
@@ -79,15 +72,15 @@ class model
         {
             for(int b = 0; b < structure[a].size(); b++) 
             {
-                neurons* n1 = &structure[a][b];
+                neuron* n1 = &structure[a][b];
                 
-                for(neurons& nrs : structure[a+1])
+                for(neuron& n : structure[a+1])
                 {
-                    neurons* n2 = &nrs;
+                    neuron* n2 = &n;
                     
-                    path* p = new path( &(n1->neuron), &(n2->neuron) );
-                    n1->pathOut.push_back(*p);
-                    n2->pathIn.push_back(*p);
+                    path* p = new path( n1, n2 );
+                    n1->addPathOut(p);
+                    n2->addPathIn(p);
                 }
             }
         }
@@ -104,7 +97,7 @@ class model
     
     void charge(vector<float> input)
     {
-        for(int i = 0; structure[0].size() > i; i++) { structure[0][i].neuron.charge(input[i]); }
+        for(int i = 0; structure[0].size() > i; i++) { structure[0][i].charge(input[i]); }
     }
     
     void fire()
@@ -113,8 +106,8 @@ class model
         {
             for(int i = 0; structure[l].size() > i; i++)
             {
-                float f = structure[l][i].neuron.fire();
-                for(path& p : structure[l][i].pathOut) { p.fire(f); }
+                float f = structure[l][i].fire();
+                for(path* p : structure[l][i].pathOut) { p->fire(f); }
             }
         }
     }
@@ -122,7 +115,7 @@ class model
     vector<float> discharge()
     {
         vector<float> output;
-        for(neurons& nrs : structure.back()) { output.push_back(nrs.neuron.discharge()); }
+        for(neuron& n : structure.back()) { output.push_back(n.discharge()); }
         return output;
     }
     

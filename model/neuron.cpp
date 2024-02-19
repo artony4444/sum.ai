@@ -1,4 +1,4 @@
-
+class path;
 
 class neuron
 {
@@ -8,6 +8,9 @@ class neuron
     
     float bias = random_float() * 2 - 1;
     float charges = 0;
+    
+    vector<path*> pathIn;
+    vector<path*> pathOut;
     
     neuron(){}
     
@@ -36,6 +39,18 @@ class neuron
     float activation(float c)
     {
         return c; // 0 > c ? 0 : c;
+    }
+    
+    // path
+    
+    void addPathIn(path* p)
+    {
+        pathIn.push_back(p);
+    }
+    
+    void addPathOut(path* p)
+    {
+        pathOut.push_back(p);
     }
 };
 
