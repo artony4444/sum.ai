@@ -13,6 +13,8 @@ int main()
 {
     seedRandom();
     
+    // training 
+    
     int size = 10;
     
     model m(size, {size}, size);

@@ -22,48 +22,6 @@ class model
         connectDense();
     }
     
-    // input -----
-    
-    int input(int i)
-    {
-        return input(vectorize(i));
-    }
-    
-    int input(vector<int> i)
-    {
-        return postprocess(input(preprocess(i)));
-    }
-    
-    vector<float> input(vector<float> input)
-    {
-        return forwardprop(input);
-    }
-    
-    // train -----
-    
-    int train(int i, int e)
-    {
-        return train(vectorize(i), vectorize(e));
-    }
-    
-    int train(vector<int> i, vector<int> e)
-    {
-        return postprocess(train(preprocess(i), preprocess(e)));
-    }
-    
-    vector<float> train(vector<float> input, vector<float> expected)
-    {
-        vector<float> output = this->input(input);
-        // backprop lossF gradiantD
-        return output;
-    }
-    
-    
-    // ---------- helper ---------- //
-    
-    
-    // structure -----
-    
     vector<neuron> createLayer(int size, string name) { return *new vector<neuron>(size, *new neuron(name) ); }
     
     void connectDense()
@@ -78,7 +36,7 @@ class model
                 {
                     neuron* n2 = &n;
                     
-                    path* p = new path( n1, n2 );
+                    neuron::path* p = new neuron::path( n1, n2 );
                     n1->addPathOut(p);
                     n2->addPathIn(p);
                 }
@@ -86,14 +44,40 @@ class model
         }
     }
     
+    // input -----
+    
+    int input(int index) { return input(toVector(index)); }
+    
+    int input(vector<int> i) { return postprocess(input(preprocess(i))); }
+    
+    vector<float> input(vector<float> input) 
+    { 
+        return feedforward(input);
+    }
+    
+    // train -----
+    
+    int train(int i, int e) { return train(toVector(i), toVector(e)); } //  (i)input  (e)expected
+    
+    int train(vector<int> i, vector<int> e) { return postprocess(train(preprocess(i), preprocess(e))); }
+    
+    vector<float> train(vector<float> i, vector<float> e)
+    {
+        vector<float> output = this->input(i);
+        // backprop lossF gradiantD
+        return output;
+    }
+    
     // forwardprop -----
     
-    vector<float> forwardprop(vector<float> input)
+    vector<float> feedforward(vector<float> input)
     {
         charge(input);
         fire();
         return discharge();
     }
+    
+    // cycle -----
     
     void charge(vector<float> input)
     {
@@ -106,8 +90,7 @@ class model
         {
             for(int i = 0; structure[l].size() > i; i++)
             {
-                float f = structure[l][i].fire();
-                for(path* p : structure[l][i].pathOut) { p->fire(f); }
+                structure[l][i].fire();
             }
         }
     }
@@ -121,7 +104,7 @@ class model
     
     // processing -----
     
-    vector<float> preprocess(vector<int> indexes)
+    vector<float> preprocess(vector<int> indexes) // indexes > charges | creates a float vector and charges indexes with charge "1".
     {
         int size = structure[0].size();
         vector<float> output(size, 0);
@@ -129,7 +112,7 @@ class model
         return output;
     }
     
-    int postprocess(vector<float> output)
+    int postprocess(vector<float> output) // charges > index | gets index of max charge in a vector
     {
         int len = output.size();
         int maxIndex = 0;
