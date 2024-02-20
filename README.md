@@ -8,13 +8,17 @@
 #### 👍 added
 + structure generation
 + forward propagation
++ backpropagation
++ loss function
++ optimizer
 
   
 #### 🎯 to add
-- activation functions
-- backpropagation
-- loss function
-- optimizer
+- RNN
+- LTM
+- STM
+- CNN
+
 
 
 ##
