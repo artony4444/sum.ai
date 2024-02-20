@@ -61,10 +61,14 @@ class model
     
     int train(vector<int> i, vector<int> e) { return postprocess(train(preprocess(i), preprocess(e))); }
     
-    vector<float> train(vector<float> i, vector<float> e)
+    vector<float> train(vector<float> input, vector<float> expected)
     {
-        vector<float> output = this->input(i);
-        // backprop lossF gradiantD
+        vector<float> output = this->input(input);
+        
+        vector<float> loss = getLoss(output, expected);
+        
+        int i = 0; for(neuron& n : structure.back()) { n.feedback(loss[i]); i++; }
+        
         return output;
     }
     
@@ -99,7 +103,19 @@ class model
     {
         vector<float> output;
         for(neuron& n : structure.back()) { output.push_back(n.discharge()); }
-        return output;
+        return functions::softmax(output);
+    }
+    
+    // backprop -----
+    
+    vector<float> getLoss(vector<float> output, vector<float> expected)
+    {
+        vector<float> loss;
+        for(int i = 0; i < output.size(); i++)
+        {
+            loss.push_back(expected[i] - output[i]);
+        }
+        return loss;
     }
     
     // processing -----

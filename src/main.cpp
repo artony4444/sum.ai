@@ -19,10 +19,13 @@ int main()
     
     model m(size, {size}, size);
     
-    for(int a = 0; a < 10; a++)
+    int fail = 0;
+    for(int a = 0; a < 100; a++)
     {
         int in = random_float() * size;
         int out = m.train(in, in);
-        cout << in << " > " << out << endl;
+        bool pass = (in == out); if(!pass) fail++;
+        cout << in << " > " << out << (pass ? " PASS" : " ") << endl;
     }
+    cout << endl << "fail count :" << fail << endl;
 }

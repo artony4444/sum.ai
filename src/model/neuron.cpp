@@ -8,6 +8,7 @@ class neuron
     
     float bias = random_float() * 2 - 1;
     float charges = 0;
+    float lastCharge = 0;
     
     class path;
     vector<path*> pathIn;
@@ -25,7 +26,8 @@ class neuron
     {
         float c = charges;
         charges = 0;
-        return c + bias;
+        lastCharge = c;
+        return c; // + bias; // (bias sucks!)
     }
     
     float fire()
@@ -38,6 +40,14 @@ class neuron
     float activation(float c)
     {
         return c; // 0 > c ? 0 : c;
+    }
+    
+    // back propogation
+    
+    void feedback(float loss) // shift this function to model for better control?
+    {
+        bias += loss * vars::plasticity;
+        for(path* p : pathIn) { p->feedback(loss); }
     }
     
     // path
@@ -57,12 +67,12 @@ class neuron
         public:
         
         float weight = random_float() * 2 - 1;
+        float lastCharge = 0;
         
         neuron* from;
         neuron* to;
         
         path(neuron* in, neuron* out)
-        
         {
             from = in;
             to = out;
@@ -70,7 +80,14 @@ class neuron
         
         void fire(float c)
         {
+            lastCharge = c * weight;
             to->charge(c * weight);
+        }
+        
+        void feedback(float loss)
+        {
+            weight += from->lastCharge * loss * vars::plasticity;
+            from->feedback(loss);
         }
     };
 };

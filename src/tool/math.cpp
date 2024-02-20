@@ -4,6 +4,7 @@
 
 #include <stdlib.h> // rand()
 #include <time.h>   // time(NULL)
+//#include <cmath>    // exp()
 
 void seedRandom()
 {
@@ -21,8 +22,14 @@ class functions
 {
     public:
     
-    static void sigmoid()
+    
+    static vector<float> softmax(vector<float> input)
     {
-        cout << "hello i am sigmoid." << endl;
+        vector<float> output;
+        float sum = 0;
+        for(float i : input) { sum += exp(i); }
+        for(float i : input) { output.push_back(exp(i) / sum); }
+        return output;
     }
 };
+
