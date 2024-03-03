@@ -33,7 +33,7 @@ dataset getData(string type = "test") // test - train
     vector<vector<float>> inputs; // 28x28 = 784
     vector<int> expected;
     
-    for(int a = 0; a < 60000 && getline(file, line); a++)
+    for(int a = 0; a < 1000 && getline(file, line); a++)
     {
         vector<string> str = split(line, ",");
         vector<float> train = toFloats(str);
@@ -71,7 +71,8 @@ int main()
     int oSize = 10;
     
     vars::biasPlasticity = 0.1;
-    vars::plasticity = 0.01;
+    vars::plasticity = 0.03;
+    vars::batchSize = 1;
     
     cnn cnn(imgSize, cnnSize, mpSize);
     model m(iSize, hSize, oSize);

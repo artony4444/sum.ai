@@ -2,14 +2,15 @@
 
 // ----- helper ----- //
 
-vector<int> toVector(int e) { return *new vector<int>{e}; }
-
 struct vars
 {
     inline static float plasticity = 1.0;
     inline static float biasPlasticity = 1.0;
+    inline static int batchSize = 100;
+    
 };
 
+vector<int> toVector(int e) { return *new vector<int>{e}; }
 
 vector<string> split(string str, string target)
 {

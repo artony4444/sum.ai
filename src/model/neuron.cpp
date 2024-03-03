@@ -41,22 +41,25 @@ class neuron
     
     // back propogation
     
+    int batchID = 1;
+    
     void backpropogate(float loss)
     {
-        update(loss); // softmax derivative (loss * (1 - loss))
+        update(loss, batchID); // softmax derivative (loss * (1 - loss))
+        batchID++; if(batchID > vars::batchSize) batchID = 1;
     }
     
-    void feedback(float loss, float weight)
+    void feedback(float loss, float weight, int bid)
     {
-        update(loss * weight * 1);
+        update(loss * weight * 1, bid);
     }
     
-    void update(float loss)
+    void update(float loss, int bid)
     {
         if(loss == 0) return; if(name[0] == 'i') return;
         lastLoss = loss;
         bias += loss * vars::biasPlasticity;
-        for(path* p : pathIn) { p->feedback(loss); }
+        for(path* p : pathIn) { p->feedback(loss, bid); }
     }
     
     // path
@@ -101,10 +104,20 @@ class neuron
         float lastLoss = 0;
         float lastGradient = 0;
         
-        void feedback(float loss)
+        float lossSum = 0;
+        int lossCount = 0;
+        
+        void feedback(float loss, int batchID)
         {
-            weight += from->lastCharge * loss * vars::plasticity;
-            from->feedback(loss, weight);
+            float cLoss = from->lastCharge * loss * vars::plasticity;
+            lossSum += cLoss; lossCount++;
+            
+            if(batchID >= vars::batchSize)
+            {
+                weight += (lossSum / lossCount);
+                lossSum = 0; lossCount = 0;
+            }
+            from->feedback(loss, weight, batchID);
         }
     };
 };
