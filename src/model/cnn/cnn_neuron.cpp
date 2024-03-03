@@ -1,42 +1,52 @@
-
-
-class neuron
+class cnn_neuron
 {
     public:
     
     string name = "unspecified";
     
-    float bias = 0; //random_float() * 2 - 1;
+    float bias = 0;
+    float filter = random_float() * 2 - 1;
     
     float charges = 0;
     float lastCharge = 0;
-    float lastLoss = 0;
     
-    neuron(){}
-    neuron(string n) { name = n + to_string( (int) (random_float(1000)*1000) ); }
+    bool debug = true;
+    bool init = false;
+    
+    cnn_neuron(){}
+    cnn_neuron(string n)
+    {
+        getName(n);
+    }
+    
+    void getName(string n)
+    {
+        name = n + to_string( (int) (random_float(1000)*1000) );
+    }
     
     void charge(float c)
     {
+        if(name[0] == 'm') charges = c > charges ? c : charges;
         charges += c;
     }
     
     float discharge()
     {
-        float c = charges;// + bias;
+        float c = charges; //+ bias;
         charges = 0;
+        lastCharge = c;
         return c; // + bias; // (bias sucks!)
     }
     
     void fire()
     {
-        float c = activation(discharge());// if(c < 0) return;
-        lastCharge = c;
+        float c = activation(discharge()); // if(c <= 0) return;
         for(path* p : pathOut) { p->fire(c); }
     }
     
     float activation(float c)
     {
-        return tanh(c);
+        return name[0] == 'm' ? c * filter : functions::sigmoid(c);
     }
     
     // back propogation
@@ -54,8 +64,8 @@ class neuron
     void update(float loss)
     {
         if(loss == 0) return; if(name[0] == 'i') return;
-        lastLoss = loss;
-        bias += loss * vars::biasPlasticity;
+        // bias += loss * vars::biasPlasticity;
+        filter += loss * vars::biasPlasticity;
         for(path* p : pathIn) { p->feedback(loss); }
     }
     
@@ -79,13 +89,14 @@ class neuron
     {
         public:
         
-        float weight = random_float() * 2 - 1;
+        float weight = 1;// random_float() * 2 - 1;
         
-        neuron* from;
-        neuron* to;
+        cnn_neuron* from;
+        cnn_neuron* to;
         
-        path(neuron* in, neuron* out)
+        path(cnn_neuron* in, cnn_neuron* out)
         {
+            // cout << in->name << " > " << out->name << endl;
             from = in;
             to = out;
         }
@@ -101,9 +112,10 @@ class neuron
         float lastLoss = 0;
         float lastGradient = 0;
         
+        
         void feedback(float loss)
         {
-            weight += from->lastCharge * loss * vars::plasticity;
+            // weight += from->lastCharge * loss * vars::plasticity;
             from->feedback(loss, weight);
         }
     };

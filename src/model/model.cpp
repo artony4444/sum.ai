@@ -63,14 +63,18 @@ class model
     
     vector<float> train(vector<float> input, vector<float> expected)
     {
-        vector<float> output = this->input(input);
-        
+        vector<float> rawOutput = this->input(input);
+        vector<float> output = functions::softmax(rawOutput); // if(postprocess(output) == postprocess(expected)) return output; // increases flexiblity
         vector<float> loss = getLoss(output, expected);
-        
-        int i = 0; for(neuron& n : structure.back()) { n.feedback(loss[i]); i++; }
-        
+        int i = 0; for(neuron& n : structure.back()) { n.backpropogate(loss[i] /* summ(rawOutput)*/ ); i++; }
         return output;
     }
+    
+    int train(vector<float> i, int e) { return train(i, toVector(e)); } //  (i)input  (e)expected
+    
+    int train(vector<float> i, vector<int> e) { return postprocess(train(i, preprocess(e))); }
+    
+    
     
     // forwardprop -----
     
@@ -102,8 +106,8 @@ class model
     vector<float> discharge()
     {
         vector<float> output;
-        for(neuron& n : structure.back()) { output.push_back(n.discharge()); }
-        return functions::softmax(output);
+        for(neuron& n : structure.back()) { output.push_back(n.discharge()); } // print(output);
+        return output;
     }
     
     // backprop -----
@@ -113,8 +117,15 @@ class model
         vector<float> loss;
         for(int i = 0; i < output.size(); i++)
         {
-            loss.push_back(expected[i] - output[i]);
+            loss.push_back(expected[i] - output[i]); // cout << i << "  e:" << expected[i] << "   o:" << roundm(output[i]) << "   l:" << roundm(loss.back()) << endl;
         }
+        return loss;
+    }
+    
+    vector<float> getLastLoss()
+    {
+        vector<float> loss;
+        for(neuron& n : structure.back()) { loss.push_back(n.lastLoss); } // print(output);
         return loss;
     }
     
