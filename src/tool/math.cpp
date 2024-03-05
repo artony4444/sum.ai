@@ -21,31 +21,29 @@ float roundm(float n, float multiple = 0.01)
     return (int)(n * 1/multiple) / (float)(1/multiple);
 }
 
-int summ(vector<int> s)
+int summ(vector<int>& s)
 {
     int sum = 0;
-    for(int num : s) { sum += num; }
+    for(int& num : s) { sum += num; }
     return sum;
 }
-float summ(vector<float> s)
+float summ(vector<float>& s)
 {
     float sum = 0;
-    for(float num : s) { sum += num; }
+    for(float& num : s) { sum += num; }
     return sum;
 }
 
-int multt(vector<int> s)
+int multt(vector<int>& s)
 {
     int sum = 1;
-    for(int num : s) { sum *= num; }
+    for(int& num : s) { sum *= num; }
     return sum;
 }
 
-vector<float> divv(vector<float> arr, float by)
+void divv(vector<float>& arr, float by)
 {
-    vector<float> divide;
-    for(float num : arr) { divide.push_back(num / by); }
-    return divide;
+    for(float& num : arr) { num = (num / by); }
 }
 
 // ----- functions ----- //

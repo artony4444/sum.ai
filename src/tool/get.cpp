@@ -6,13 +6,16 @@ struct vars
 {
     inline static float plasticity = 1.0;
     inline static float biasPlasticity = 1.0;
-    inline static int batchSize = 100;
+    inline static int batchSize = 1;
+    inline static int epoch = 1;
+    inline static int maxDatasetSize = 60000;
+    
     
 };
 
 vector<int> toVector(int e) { return *new vector<int>{e}; }
 
-vector<string> split(string str, string target)
+vector<string> split(string& str, string target)
 {
     int targetSize = target.size();
     int strSize = str.size();
@@ -38,7 +41,7 @@ vector<string> split(string str, string target)
     return s;
 }
 
-vector<float> toFloats(vector<string> s)
+vector<float> toFloats(vector<string>& s)
 {
     vector<float> o;
     
@@ -49,9 +52,9 @@ vector<float> toFloats(vector<string> s)
     return o;
 }
 
-void print(vector<float> f)
+void print(vector<float>&  f)
 {
-    for(float fl : f)
+    for(float& fl : f)
     {
         cout << fl << "    ";
     }

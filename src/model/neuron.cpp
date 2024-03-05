@@ -6,9 +6,9 @@ class neuron
     
     string name = "unspecified";
     
-    float bias = 0; //random_float() * 2 - 1;
-    
+    float bias = 0;
     float charges = 0;
+    
     float lastCharge = 0;
     float lastLoss = 0;
     
@@ -22,14 +22,14 @@ class neuron
     
     float discharge()
     {
-        float c = charges;// + bias;
+        float c = charges + bias;
         charges = 0;
-        return c; // + bias; // (bias sucks!)
+        return c;
     }
     
     void fire()
     {
-        float c = activation(discharge());// if(c < 0) return;
+        float c = activation(discharge());
         lastCharge = c;
         for(path* p : pathOut) { p->fire(c); }
     }
@@ -41,28 +41,41 @@ class neuron
     
     // back propogation
     
-    int batchID = 1;
+    int batchID = 1; // starts with 1 and ends at batchSize
     
-    void backpropogate(float loss)
+    void backpropogate(float loss) // callFrom line4 model::train()
     {
-        update(loss, batchID); // softmax derivative (loss * (1 - loss))
+        update(loss, batchID);
         batchID++; if(batchID > vars::batchSize) batchID = 1;
     }
     
-    void feedback(float loss, float weight, int bid)
+    void feedback(float loss, float weight, int bid) // callFrom lastLine neuron::path::feedback()
     {
-        update(loss * weight * 1, bid);
+        update(loss * weight * (1-(pow(tanh(lastCharge),2))) , bid); // derivative of tanh 1-tanh²
     }
+    
+    float lossSum = 0; int lossCount = 0;
     
     void update(float loss, int bid)
     {
         if(loss == 0) return; if(name[0] == 'i') return;
         lastLoss = loss;
-        bias += loss * vars::biasPlasticity;
+        
+        // current loss
+        float cLoss = loss * vars::biasPlasticity;
+        lossSum += cLoss; lossCount++;
+        
+        if(bid >= vars::batchSize) // bias changes after every batch
+        {
+            // average loss
+            bias += (lossSum / lossCount);
+            lossSum = 0; lossCount = 0;
+        }
+        
         for(path* p : pathIn) { p->feedback(loss, bid); }
     }
     
-    // path
+    // path -----
     
     class path;
     vector<path*> pathIn;
@@ -102,21 +115,22 @@ class neuron
         
         float lastCharge = 0;
         float lastLoss = 0;
-        float lastGradient = 0;
         
-        float lossSum = 0;
-        int lossCount = 0;
+        float lossSum = 0; int lossCount = 0;
         
         void feedback(float loss, int batchID)
         {
+            // current loss
             float cLoss = from->lastCharge * loss * vars::plasticity;
             lossSum += cLoss; lossCount++;
             
-            if(batchID >= vars::batchSize)
+            if(batchID >= vars::batchSize) // weight changes after every batch
             {
+                // average loss
                 weight += (lossSum / lossCount);
                 lossSum = 0; lossCount = 0;
             }
+            
             from->feedback(loss, weight, batchID);
         }
     };

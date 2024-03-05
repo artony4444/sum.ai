@@ -66,7 +66,7 @@ class model
         vector<float> rawOutput = this->input(input);
         vector<float> output = functions::softmax(rawOutput); // if(postprocess(output) == postprocess(expected)) return output; // increases flexiblity
         vector<float> loss = getLoss(output, expected);
-        int i = 0; for(neuron& n : structure.back()) { n.backpropogate(loss[i] /* summ(rawOutput)*/ ); i++; }
+        int i = 0; for(neuron& n : structure.back()) { n.backpropogate(loss[i]); i++; }
         return output;
     }
     
@@ -78,7 +78,7 @@ class model
     
     // forwardprop -----
     
-    vector<float> feedforward(vector<float> input)
+    vector<float> feedforward(vector<float>& input)
     {
         charge(input);
         fire();
@@ -87,7 +87,7 @@ class model
     
     // cycle -----
     
-    void charge(vector<float> input)
+    void charge(vector<float>& input)
     {
         for(int i = 0; structure[0].size() > i; i++) { structure[0][i].charge(input[i]); }
     }
@@ -112,7 +112,9 @@ class model
     
     // backprop -----
     
-    vector<float> getLoss(vector<float> output, vector<float> expected)
+    // read with model::train()
+    
+    vector<float> getLoss(vector<float>& output, vector<float>& expected)
     {
         vector<float> loss;
         for(int i = 0; i < output.size(); i++)
