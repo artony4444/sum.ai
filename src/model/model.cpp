@@ -124,13 +124,6 @@ class model
         return loss;
     }
     
-    vector<float> getLastLoss()
-    {
-        vector<float> loss;
-        for(neuron& n : structure.back()) { loss.push_back(n.lastLoss); } // print(output);
-        return loss;
-    }
-    
     // processing -----
     
     vector<float> preprocess(vector<int> indexes) // indexes > charges | creates a float vector and charges indexes with charge "1".

@@ -8,12 +8,13 @@ class neuron
     
     float bias = 0;
     float charges = 0;
-    
     float lastCharge = 0;
-    float lastLoss = 0;
+    
     
     neuron(){}
     neuron(string n) { name = n + to_string( (int) (random_float(1000)*1000) ); }
+    
+    // feed forward
     
     void charge(float c)
     {
@@ -41,38 +42,23 @@ class neuron
     
     // back propogation
     
-    int batchID = 1; // starts with 1 and ends at batchSize
-    
-    void backpropogate(float loss) // callFrom line4 model::train()
+    void backpropogate(float loss) // call from model::train() || once every train samples
     {
-        update(loss, batchID);
-        batchID++; if(batchID > vars::batchSize) batchID = 1;
+        update(loss);
     }
     
-    void feedback(float loss, float weight, int bid) // callFrom lastLine neuron::path::feedback()
+    void feedback(float loss, float weight) // call from neuron::path::feedback() || multiple times from every pathOut
     {
-        update(loss * weight * (1-(pow(tanh(lastCharge),2))) , bid); // derivative of tanh 1-tanh²
+        update(loss * weight); // derivative of tanh 1-tanh² || derivatives sucks!
     }
     
-    float lossSum = 0; int lossCount = 0;
-    
-    void update(float loss, int bid)
+    void update(float loss)
     {
         if(loss == 0) return; if(name[0] == 'i') return;
-        lastLoss = loss;
         
-        // current loss
-        float cLoss = loss * vars::biasPlasticity;
-        lossSum += cLoss; lossCount++;
+        bias += (loss * vars::biasPlasticity * (1/pathOut.size()) ) / vars::batchSize;
         
-        if(bid >= vars::batchSize) // bias changes after every batch
-        {
-            // average loss
-            bias += (lossSum / lossCount);
-            lossSum = 0; lossCount = 0;
-        }
-        
-        for(path* p : pathIn) { p->feedback(loss, bid); }
+        for(path* p : pathIn) { p->feedback(loss); }
     }
     
     // path -----
@@ -95,7 +81,7 @@ class neuron
     {
         public:
         
-        float weight = random_float() * 2 - 1;
+        float weight = ((random_float() * 2.9) - 1.45) * vars::plasticity;// * 2.9 - 1.45;
         
         neuron* from;
         neuron* to;
@@ -109,29 +95,14 @@ class neuron
         void fire(float c)
         {
             float charge = c * weight;
-            lastCharge = charge;
             to->charge(charge);
         }
         
-        float lastCharge = 0;
-        float lastLoss = 0;
-        
-        float lossSum = 0; int lossCount = 0;
-        
-        void feedback(float loss, int batchID)
+        void feedback(float loss)
         {
-            // current loss
-            float cLoss = from->lastCharge * loss * vars::plasticity;
-            lossSum += cLoss; lossCount++;
+            weight += (from->lastCharge * loss * vars::plasticity) / vars::batchSize;
             
-            if(batchID >= vars::batchSize) // weight changes after every batch
-            {
-                // average loss
-                weight += (lossSum / lossCount);
-                lossSum = 0; lossCount = 0;
-            }
-            
-            from->feedback(loss, weight, batchID);
+            from->feedback(loss, weight);
         }
     };
 };

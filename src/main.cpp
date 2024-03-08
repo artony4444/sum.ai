@@ -80,10 +80,10 @@ int main()
     vector<int> hSize = {15};    // hiddenSize
     int oSize = 10;              // outputSize
     
-    vars::biasPlasticity = 0.001;
+    vars::biasPlasticity = 0.001; // 0.001
     vars::plasticity = 0.01;
     vars::batchSize = 1;
-    vars::epoch = 1;
+    vars::epoch = 6;
     
     model m(iSize, hSize, oSize);
     
@@ -101,11 +101,9 @@ int main()
                 accuracyV.erase(accuracyV.begin()); accuracyV.push_back(pass*100);
                 int accuracy = (int)(summ(accuracyV) / accuracyStep); //(int)((1-((float)fail/count))*100);
                 cout << x << y << " " << accuracy << "% "; cout << i << " (" << e << " > " << out << ")" << (pass ? " PASS" : " ") << endl;
-                // printInput(inputs[i]);
+                // printInput(inputs[i]); // show image
                 // printInput(getWsum(m));
                 // printInput(m.getLastLoss());
-                // printInput(getWsum(cnn));
-                // if(i % 1000 == 0) { fail = 0; count = 0; }
             }
         }
     }
@@ -125,77 +123,10 @@ int main()
         bool pass = (out == e); count++; if(!pass) fail++;
         int accuracy = (int)((1-((float)fail/count))*100);
         cout << accuracy << "% "; cout << i << " (" << e << " > " << out << ")" << (pass ? " PASS" : " ") << endl;
-        // printInput(inputs[i]);
+        // printInput(inputs[i]); // show image
         // printInput(getWsum(m));
         // printInput(m.getLastLoss());
-        // if(i % 1000 == 0) { fail = 0; count = 0; }
     }
     
     // cout << endl << "fail count :" << fail << endl;
 }
-
-
-/*
-int main() // test2 disabled
-{
-    seedRandom();
-    
-    // scale back and forward prop
-    
-    // training 
-    
-    int size = 10;
-    
-    int iSize = size;
-    vector<int> hSize = {size};
-    int oSize = size;
-    
-    vars::biasPlasticity = 0.1;
-    vars::plasticity = 1;
-    vars::batchSize = 10;
-    
-    int totalAccuracy = 0;
-    int totalaccuracyCount = 0;
-    
-    for(int z = 0; z < 10; z++)
-    {
-        model m(iSize, hSize, oSize);
-        
-        int fail = 0; int count = 0;
-        
-        for(int a = 0; a < 10 * vars::batchSize; a++)
-        {
-            int in = a % iSize; // random_float() * size;
-            int e = in % oSize;
-            
-            int out = m.train(in, e);
-            bool pass = (out == e); count++; if(!pass) fail++;
-            // cout << (int)((1-((float)fail/count))*100) << "% "; cout << a << " (" << e << " > " << out << ")" << (pass ? " PASS" : " ") << endl;
-        }
-        int accuracy = (int)((1-((float)fail/count))*100);
-        totalAccuracy += accuracy; totalaccuracyCount++;
-        cout << endl << "fail count :" << fail << endl;
-        cout << "accuracy : " << accuracy << "%" << endl;
-    }
-    
-    cout << endl << "total accuracy : " << (totalAccuracy/totalaccuracyCount) << "%";
-    
-    
-    cout << endl << "TESTING----------------" << endl << endl;
-    
-    fail = 0; count = 0;
-    
-    for(int a = 0; a < 999; a++)
-    {
-        int in = a % iSize; // random_float() * size;
-        int e = in % oSize;
-        
-        int out = m.input(in);
-        bool pass = (out == e); count++; if(!pass) fail++;
-        cout << (int)((1-((float)fail/count))*100) << "% "; cout << a << " (" << e << " > " << out << ")" << (pass ? " PASS" : " ") << endl;
-    }
-    
-    cout << endl << "fail count :" << fail << endl;
-
-}
-*/
