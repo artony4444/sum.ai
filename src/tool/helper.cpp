@@ -5,7 +5,7 @@ void printInput(vector<float> input)
     
     for(float i : input)
     {
-        if(index % (int) sqrt(input.size()) == 0) cout << "|" << endl; index++;
+        if(index % (int) sqrt(input.size()) == 0) cout << endl; index++;
         cout << (i > 0 ? "■" : "□");
     }
     cout << endl << endl << endl;
@@ -31,18 +31,22 @@ vector<float> getWsum(model m)
     return val;
 }
 
-vector<float> getWsum(cnn m)
+vector<float> getWsum(cnn& m)
 {
     vector<float> val;
-    for(vector<cnn_neuron> ns : m.structure[1])
+    for(vector<cnn_neuron>& ns : m.structure[0])
     {
         for(cnn_neuron n : ns)
         {
-            float sum = n.filter;
+            float sum = 0;
             for(cnn_neuron::path* p : n.pathOut)
             {
-                // sum += p->weight;
-                // sum += p->from->filter;
+                sum += p->weight;
+                
+                for(cnn_neuron::path* p2 : p->to->pathOut)
+                {
+                    sum += p2->weight;
+                }
             }
             val.push_back(sum);
         }

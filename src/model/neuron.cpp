@@ -10,7 +10,6 @@ class neuron
     float charges = 0;
     float lastCharge = 0;
     
-    
     neuron(){}
     neuron(string n) { name = n + to_string( (int) (random_float(1000)*1000) ); }
     
@@ -52,9 +51,11 @@ class neuron
         update(loss * weight); // derivative of tanh 1-tanh² || derivatives sucks!
     }
     
+    float lastLoss = 0;
+    
     void update(float loss)
     {
-        if(loss == 0) return; if(name[0] == 'i') return;
+        if(loss == 0) return; if(name[0] == 'i') { lastLoss = loss; return; }
         
         bias += (loss * vars::biasPlasticity * (1/pathOut.size()) ) / vars::batchSize;
         

@@ -3,9 +3,9 @@ class cnn_neuron
     public:
     
     string name = "unspecified";
+    int id = 8888;
     
     float bias = 0;
-    float filter = random_float() * 2 - 1;
     
     float charges = 0;
     float lastCharge = 0;
@@ -32,21 +32,21 @@ class cnn_neuron
     
     float discharge()
     {
-        float c = charges; //+ bias;
+        float c = charges + bias;
         charges = 0;
-        lastCharge = c;
-        return c; // + bias; // (bias sucks!)
+        return c;
     }
     
     void fire()
     {
         float c = activation(discharge()); // if(c <= 0) return;
+        lastCharge = c;
         for(path* p : pathOut) { p->fire(c); }
     }
     
     float activation(float c)
     {
-        return name[0] == 'm' ? c * filter : functions::sigmoid(c);
+        return name[0] == 'm' ? c : functions::relu(c);
     }
     
     // back propogation
@@ -58,14 +58,13 @@ class cnn_neuron
     
     void feedback(float loss, float weight)
     {
-        update(loss * weight * 1);
+        update(loss * 1 * 1);
     }
     
     void update(float loss)
     {
         if(loss == 0) return; if(name[0] == 'i') return;
-        // bias += loss * vars::biasPlasticity;
-        filter += loss * vars::biasPlasticity;
+        bias += loss * vars::biasPlasticity;
         for(path* p : pathIn) { p->feedback(loss); }
     }
     
@@ -89,7 +88,7 @@ class cnn_neuron
     {
         public:
         
-        float weight = 1;// random_float() * 2 - 1;
+        float weight = random_float() * 2 - 1;
         
         cnn_neuron* from;
         cnn_neuron* to;
@@ -112,10 +111,9 @@ class cnn_neuron
         float lastLoss = 0;
         float lastGradient = 0;
         
-        
         void feedback(float loss)
         {
-            // weight += from->lastCharge * loss * vars::plasticity;
+            weight += from->lastCharge * loss * vars::plasticity;
             from->feedback(loss, weight);
         }
     };
