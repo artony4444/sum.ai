@@ -1,12 +1,3 @@
-/*
-    reading suggestion
-    1) model/neuron.cpp
-    2) model/model.cpp
-    3) main.cpp
-    tools/* with all of them
-    
-    ignore model/cnn/* (under development)
-*/
 
 #include <iostream>
 #include <vector>
@@ -14,11 +5,14 @@ using namespace std;
 
 #include "tool/math.cpp"
 #include "tool/get.cpp"
+
 #include "model/neuron.cpp"
 #include "model/model.cpp"
 
 #include "model/cnn/cnn_neuron.cpp"
 #include "model/cnn/cnn.cpp"
+#include "model/lstm/lstm_cell.cpp"
+
 #include "tool/helper.cpp"
 
 #include <fstream>
