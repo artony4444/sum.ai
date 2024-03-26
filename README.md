@@ -6,17 +6,11 @@
 ## Features
 
 #### 👍 added
-+ structure generation
-+ forward propagation
-+ backpropagation
-+ loss function
-+ optimizer
++ DNN
 
   
-#### 🎯 to add
-- RNN
-- LTM
-- STM
+#### 🎯 working
+- LSTM
 - CNN
 
 
