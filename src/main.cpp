@@ -51,7 +51,8 @@ dataset getData(string type = "test") // "test" or "train"
         inputs.push_back(train); // one by one, pushing lines
     }
     
-    file.close(); system("clear"); cout << "\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n";
+    file.close(); 
+    // system("clear"); cout << "\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n";
     
     return { inputs, expected };
 }
@@ -63,7 +64,7 @@ int main()
     
     // import CSV
     
-    vars::maxDatasetSize = 1000; // limits dataset import, 60,000 is huge dataset and takes time, so I limit for testing purpose
+    vars::maxDatasetSize = 60000; // limits dataset import, 60,000 is huge dataset and takes time, so I limit for testing purpose
     dataset dst = getData("train"); // imports CSV
     vector<vector<float>>& inputs = dst.inputs;
     vector<int>& expected = dst.expected;
@@ -77,7 +78,7 @@ int main()
     vars::biasPlasticity = 0.001; // 0.001
     vars::plasticity = 0.01;
     vars::batchSize = 1;
-    vars::epoch = 6;
+    vars::epoch = 1;
     
     model m(iSize, hSize, oSize);
     
@@ -92,9 +93,10 @@ int main()
                 int e = expected[i];
                 int out = m.train(inputs[i], e);
                 bool pass = (out == e); count++;// if(!pass) fail++;
+                
                 accuracyV.erase(accuracyV.begin()); accuracyV.push_back(pass*100);
                 int accuracy = (int)(summ(accuracyV) / accuracyStep); //(int)((1-((float)fail/count))*100);
-                printf("\33[2K\r"); cout << x << y << " " << accuracy << "% "; cout << i << " (" << e << " > " << out << ")" << (pass ? " PASS" : " ") << flush;
+                cout << x << y << " " << accuracy << "% "; cout << i << " (" << e << " > " << out << ")" << (pass ? " PASS" : " ") << endl; // printf("\33[2K\r"); cout << x << y << " " << accuracy << "% "; cout << i << " (" << e << " > " << out << ")" << (pass ? " PASS" : " ") << flush;
                 // printInput(inputs[i]); // show image
                 // printInput(getWsum(m));
                 // printInput(m.getLastLoss());
@@ -116,14 +118,14 @@ int main()
         int e = expected[i];
         int out = m.postprocess(m.input(inputs[i])); // m.train(cnn.input(inputs[i]), e); cnn.backpropogate(m.getLastLoss());
         bool pass = (out == e); count++; if(!pass) fail++;
+        
         accuracy = (int)((1-((float)fail/count))*100);
-        if(i != 0) printf("\33[2K\r"); cout << accuracy << "% "; cout << i << " (" << e << " > " << out << ")" << (pass ? " PASS" : " ") << flush;
+        cout << accuracy << "% "; cout << i << " (" << e << " > " << out << ")" << (pass ? " PASS" : " ") << endl; // if(i != 0) printf("\33[2K\r"); cout << accuracy << "% "; cout << i << " (" << e << " > " << out << ")" << (pass ? " PASS" : " ") << flush;
         // printInput(inputs[i]); // show image
         // printInput(getWsum(m));
         // printInput(m.getLastLoss());
     }
     
-    printf("\33[2K\r");
     cout << endl << "score : " << count-fail<<"/"<<count << endl;
     cout << "accuracy : " << accuracy << "% " << endl;
 }
@@ -167,6 +169,7 @@ int main00() // average train speed 50% optimal on (10 class & 20 samples)
             
             int out = m.train(in, e);
             bool pass = (out == e); count++; if(!pass) fail++;
+
             // cout << (int)((1-((float)fail/count))*100) << "% "; cout << a << " (" << e << " > " << out << ")" << (pass ? " PASS" : " ") << endl;
             cout << (totalAccuracy/totalaccuracyCount) << endl;
         }
@@ -189,6 +192,7 @@ int main00() // average train speed 50% optimal on (10 class & 20 samples)
         int e = in % oSize;
         
         int out = m.input(in);
+
         bool pass = (out == e); count++; if(!pass) fail++;
         cout << (int)((1-((float)fail/count))*100) << "% "; cout << a << " (" << e << " > " << out << ")" << (pass ? " PASS" : " ") << endl;
     }

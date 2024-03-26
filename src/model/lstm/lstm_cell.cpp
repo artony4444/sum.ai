@@ -40,7 +40,7 @@ class lstm_cell : public neuron
         
         float bias = 0;
         float weight = 1;
-        float s_weight = 1;
+        float h_weight = 1;
         
         string function = "sigmoid";
         
@@ -57,7 +57,7 @@ class lstm_cell : public neuron
         float run(lstm_cell* c)
         {
             float i = c->charges * weight;
-            float s = c->hidden_state * s_weight;
+            float s = c->hidden_state * h_weight;
             float sum = i + s + bias;
             return activation(sum);
         }
@@ -106,38 +106,6 @@ class lstm_cell : public neuron
 /*
 
 
-DETAILS
-
-video :- https://youtu.be/YCzL96nL7j0
-
-L = long term memory
-S = short term memory
-x¹ = potential
-x² = to remember
-σ = sigmoid()
-t = tanh()
-
-
-w = weight
-sw = stm weight
-b = bias
-c = input * W
-s = S * sW
-
-all functions have their own w, sw, b
-
-forget gate
-L = L * σ(c + s + b)
-
-input gate
-L¹ = σ(c + s + b)
-L² = t(c + s + b)
-L += L¹ * L²
-
-output gate
-S¹ = σ(c + s + b)
-S² = t(L)
-S = S¹ * S²
 
 
 
