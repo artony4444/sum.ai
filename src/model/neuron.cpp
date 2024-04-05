@@ -1,82 +1,29 @@
 
 
-class neuron
+class neuron // template class
 {
     public:
     
-    string name = "unspecified";
+    string connect = "dense";
     
-    float bias = 0;
-    float charges = 0;
-    float lastCharge = 0;
+    neuron() {}
+    neuron(string connect) { this->connect = connect; }
     
-    neuron(){}
-    neuron(string n) { name = n + to_string( (int) (random_float(1000)*1000) ); }
+    virtual string getType() { return "neuron"; }
     
-    // feed forward
+    virtual void charge(float c){}
+    virtual void fire(){}
+    virtual float discharge(){}
+    virtual float getLastCharge(){}
     
-    void charge(float c)
-    {
-        charges += c;
-    }
-    
-    float discharge()
-    {
-        float c = charges + bias;
-        charges = 0;
-        return c;
-    }
-    
-    void fire()
-    {
-        float c = activation(discharge());
-        lastCharge = c;
-        for(path* p : pathOut) { p->fire(c); }
-    }
-    
-    float activation(float c)
-    {
-        return tanh(c);
-    }
-    
-    // back propogation
-    
-    void backpropogate(float loss) // call from model::train() || once every train samples
-    {
-        update(loss);
-    }
-    
-    void feedback(float loss, float weight) // call from neuron::path::feedback() || multiple times from every pathOut
-    {
-        update(loss * weight); // derivative of tanh 1-tanh² || derivatives sucks!
-    }
-    
-    float lastLoss = 0;
-    
-    void update(float loss)
-    {
-        if(loss == 0) return; if(name[0] == 'i') { lastLoss = loss; return; }
-        
-        bias += (loss * vars::biasPlasticity * (1/pathOut.size()) ) / vars::batchSize;
-        
-        for(path* p : pathIn) { p->feedback(loss); }
-    }
-    
-    // path -----
+    virtual void backpropogate(float loss){}
+    virtual void feedback(float loss, float weight = 1){}
+    virtual void update(float loss){}
     
     class path;
-    vector<path*> pathIn;
-    vector<path*> pathOut;
     
-    void addPathIn(path* p)
-    {
-        pathIn.push_back(p);
-    }
-    
-    void addPathOut(path* p)
-    {
-        pathOut.push_back(p);
-    }
+    virtual void addPathIn(path* p){}
+    virtual void addPathOut(path* p){}
     
     class path
     {
@@ -101,8 +48,7 @@ class neuron
         
         void feedback(float loss)
         {
-            weight += (from->lastCharge * loss * vars::plasticity) / vars::batchSize;
-            
+            weight += (from->getLastCharge() * loss * vars::plasticity) / vars::batchSize;
             from->feedback(loss, weight);
         }
     };

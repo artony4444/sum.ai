@@ -1,19 +1,15 @@
 
 #include <iostream>
 #include <vector>
+#include <map>
 using namespace std;
 
 #include "tool/math.cpp"
 #include "tool/get.cpp"
-
 #include "model/neuron.cpp"
-#include "model/model.cpp"
-
-#include "model/cnn/cnn_neuron.cpp"
-#include "model/cnn/cnn.cpp"
+#include "model/vanilla.cpp"
 #include "model/lstm/lstm_cell.cpp"
-
-#include "tool/helper.cpp"
+#include "model/model.cpp"
 
 #include <fstream>
 #include <filesystem>
@@ -51,17 +47,15 @@ dataset getData(string type = "test") // "test" or "train"
         inputs.push_back(train); // one by one, pushing lines
     }
     
-    file.close(); 
-    // system("clear"); cout << "\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n";
+    file.close(); // system("clear"); cout << "\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n";
     
     return { inputs, expected };
 }
 
+/*
 
 int main()
 {
-    seedRandom(); // required to seed random once at start. (I did'nt find other way to get true random)
-    
     // import CSV
     
     vars::maxDatasetSize = 60000; // limits dataset import, 60,000 is huge dataset and takes time, so I limit for testing purpose
@@ -81,6 +75,7 @@ int main()
     vars::epoch = 1;
     
     model m(iSize, hSize, oSize);
+    // model m(new layer(784, "vanilla"), {new layer(15, "lstm")}, new layer(10,"vanilla"));
     
     int fail = 0; int count = 0; int accuracyStep = 1000; vector<float> accuracyV(accuracyStep, 0);
     
@@ -93,7 +88,6 @@ int main()
                 int e = expected[i];
                 int out = m.train(inputs[i], e);
                 bool pass = (out == e); count++;// if(!pass) fail++;
-                
                 accuracyV.erase(accuracyV.begin()); accuracyV.push_back(pass*100);
                 int accuracy = (int)(summ(accuracyV) / accuracyStep); //(int)((1-((float)fail/count))*100);
                 cout << x << y << " " << accuracy << "% "; cout << i << " (" << e << " > " << out << ")" << (pass ? " PASS" : " ") << endl; // printf("\33[2K\r"); cout << x << y << " " << accuracy << "% "; cout << i << " (" << e << " > " << out << ")" << (pass ? " PASS" : " ") << flush;
@@ -118,7 +112,6 @@ int main()
         int e = expected[i];
         int out = m.postprocess(m.input(inputs[i])); // m.train(cnn.input(inputs[i]), e); cnn.backpropogate(m.getLastLoss());
         bool pass = (out == e); count++; if(!pass) fail++;
-        
         accuracy = (int)((1-((float)fail/count))*100);
         cout << accuracy << "% "; cout << i << " (" << e << " > " << out << ")" << (pass ? " PASS" : " ") << endl; // if(i != 0) printf("\33[2K\r"); cout << accuracy << "% "; cout << i << " (" << e << " > " << out << ")" << (pass ? " PASS" : " ") << flush;
         // printInput(inputs[i]); // show image
@@ -126,6 +119,7 @@ int main()
         // printInput(m.getLastLoss());
     }
     
+    // printf("\33[2K\r");
     cout << endl << "score : " << count-fail<<"/"<<count << endl;
     cout << "accuracy : " << accuracy << "% " << endl;
 }
@@ -133,12 +127,10 @@ int main()
 
 
 
-/*
+
 
 int main00() // average train speed 50% optimal on (10 class & 20 samples)
 {
-    seedRandom();
-    
     // scale back and forward prop
     
     // training 
@@ -156,22 +148,23 @@ int main00() // average train speed 50% optimal on (10 class & 20 samples)
     float totalAccuracy = 0;
     int totalaccuracyCount = 0;
     
-    for(int z = 0; z < 5000; z++)
+    for(int z = 0; z < 1; z++)
     {
-        model m(iSize, hSize, oSize);
+        // model m(iSize, hSize, oSize);
+        model m(new layer(iSize, "vanilla"), {new layer(hSize, "lstm")}, new layer(oSize,"vanilla"));
         
         int fail = 0; int count = 0;
         
-        for(int a = 0; a < 20 * vars::batchSize; a++)
+        for(int a = 0; a < 1000 * vars::batchSize; a++)
         {
             int in = a % iSize; // random_float() * size;
             int e = in % oSize;
             
             int out = m.train(in, e);
             bool pass = (out == e); count++; if(!pass) fail++;
-
-            // cout << (int)((1-((float)fail/count))*100) << "% "; cout << a << " (" << e << " > " << out << ")" << (pass ? " PASS" : " ") << endl;
-            cout << (totalAccuracy/totalaccuracyCount) << endl;
+            // int accuracy = (int)((1-((float)fail/count))*100); // cout << accuracy << "% "; 
+            cout << a << " (" << e << " > " << out << ")" << (pass ? " PASS" : " ") << endl;
+            // cout << (totalAccuracy/totalaccuracyCount) << endl;
         }
         int accuracy = (int)((1-((float)fail/count))*100);
         totalAccuracy += accuracy; totalaccuracyCount++;
@@ -192,13 +185,11 @@ int main00() // average train speed 50% optimal on (10 class & 20 samples)
         int e = in % oSize;
         
         int out = m.input(in);
-
         bool pass = (out == e); count++; if(!pass) fail++;
         cout << (int)((1-((float)fail/count))*100) << "% "; cout << a << " (" << e << " > " << out << ")" << (pass ? " PASS" : " ") << endl;
     }
     
     cout << endl << "fail count :" << fail << endl;
-    //
-}
-
+    -/
+} 
 */

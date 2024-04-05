@@ -1,50 +1,106 @@
-
+struct layer // template
+{
+    public:
+    
+    int size;
+    vector<int> shape;
+    
+    string type;
+    string connect;
+    
+    layer(int size, string type="vanilla", string connect="dense")
+    {
+        this->size = size;
+        this->shape.push_back(size);
+        
+        this->type = type;
+        this->connect = connect;
+    }
+    
+    layer(vector<int> shape, string type="vanilla", string connect="dense")
+    {
+        this->size = summ(shape);
+        this->shape = shape;
+        
+        this->type = type;
+        this->connect = connect;
+    }
+};
 
 class model
 {
     public:
     
-    vector<vector<neuron>> structure;
+    vector<vector<neuron*>> structure;
+    vector<vector<int>> shape;
     
-    model(int inputS, vector<int> hiddenS, int outputS)
+    // constructor
+    
+    model(){}
+    
+    model(int i, vector<int> h, int o)
     {
-        createStructure(inputS, hiddenS, outputS);
-    }
-    
-    // structure -----
-    
-    void createStructure(int inputS, vector<int> hiddenS, int outputS)
-    {
-        structure.push_back(createLayer(inputS, "i"));
-        for(int n : hiddenS) {structure.push_back(createLayer(n, "h"));}
-        structure.push_back(createLayer(outputS, "o"));
+        structure.push_back(createLayer(i, "i")); shape.push_back({i});
+        for(int n : h) {structure.push_back(createLayer(n, "h")); shape.push_back({n}); }
+        structure.push_back(createLayer(o, "o")); shape.push_back({o});
         
-        connectDense();
+        connectLayers();
     }
     
-    vector<neuron> createLayer(int size, string name) { return *new vector<neuron>(size, *new neuron(name) ); }
-    
-    void connectDense()
+    model(layer* i, vector<layer*> h, layer* o)
     {
-        for(int a = 0; a < structure.size()-1; a++)
+        structure.push_back(createLayer(i->size, "i", i->type, i->connect)); shape.push_back(i->shape);
+        for(layer* l : h) { structure.push_back(createLayer(l->size, "h", l->type, l->connect)); shape.push_back(l->shape); }
+        structure.push_back(createLayer(o->size, "o", o->type, o->connect)); shape.push_back(o->shape);
+        
+        connectLayers();
+    }
+    
+    // layer
+    
+    vector<neuron*> createLayer(int size, string layer, string type="vanilla", string connect="dense")
+    {
+        vector<neuron*> r;
+        for(int a = 0; a < size; a++) { r.push_back(newNeuron(layer, type, connect)); }
+        return r;
+    }
+    
+    neuron* newNeuron(string layer, string type, string connect)
+    {
+        if(type == "vanilla") { return new vanilla(connect, layer); }
+        if(type == "lstm") { return new lstm_cell(connect, layer); }
+        return new vanilla(connect, layer);
+    }
+    
+    // connections
+    
+    void connectLayers()
+    {
+        for(int layer = structure.size()-1; layer > 0; layer--) // backward loop <--
         {
-            for(int b = 0; b < structure[a].size(); b++) 
+            for(int index = 0; index < structure[layer].size(); index++)
             {
-                neuron* n1 = &structure[a][b];
+                string connect = structure[layer][index]->connect;
                 
-                for(neuron& n : structure[a+1])
-                {
-                    neuron* n2 = &n;
-                    
-                    neuron::path* p = new neuron::path( n1, n2 );
-                    n1->addPathOut(p);
-                    n2->addPathIn(p);
-                }
+                if(connect == "dense") connectDense(layer, index);
+                else connectDense(layer, index);
             }
         }
     }
     
-    // input -----
+    void connectDense(int layer, int index)
+    {
+        neuron* n1 = structure[layer][index];
+        
+        for(neuron* n2 : structure[layer-1])
+        {
+            neuron::path* p = new neuron::path(n2, n1);
+            n2->addPathOut(p); n1->addPathIn(p);
+        }
+    }
+    
+    
+    // input
     
     int input(int index) { return input(toVector(index)); }
     
@@ -55,7 +111,7 @@ class model
         return feedforward(input);
     }
     
-    // train -----
+    // train
     
     int train(int i, int e) { return train(toVector(i), toVector(e)); } //  (i)input  (e)expected
     
@@ -63,10 +119,9 @@ class model
     
     vector<float> train(vector<float> input, vector<float> expected)
     {
-        vector<float> rawOutput = this->input(input);
-        vector<float> output = functions::softmax(rawOutput); // if(postprocess(output) == postprocess(expected)) return output; // increases flexiblity
+        vector<float> output = this->input(input);
         vector<float> loss = getLoss(output, expected);
-        int i = 0; for(neuron& n : structure.back()) { n.backpropogate(loss[i]); i++; }
+        int i = 0; for(neuron* n : structure.back()) { n->backpropogate(loss[i]); i++; }
         return output;
     }
     
@@ -75,8 +130,7 @@ class model
     int train(vector<float> i, vector<int> e) { return postprocess(train(i, preprocess(e))); }
     
     
-    
-    // forwardprop -----
+    // forwardprop
     
     vector<float> feedforward(vector<float>& input)
     {
@@ -85,20 +139,18 @@ class model
         return discharge();
     }
     
-    // cycle -----
-    
     void charge(vector<float>& input)
     {
-        for(int i = 0; structure[0].size() > i; i++) { structure[0][i].charge(input[i]); }
+        for(int i = 0; i < structure[0].size(); i++) { structure[0][i]->charge(input[i]); }
     }
     
     void fire()
     {
-        for(int l = 0; structure.size()-1 > l; l++)
+        for(int l = 0; l < structure.size(); l++)
         {
-            for(int i = 0; structure[l].size() > i; i++)
+            for(int i = 0; i < structure[l].size(); i++)
             {
-                structure[l][i].fire();
+                structure[l][i]->fire();
             }
         }
     }
@@ -106,13 +158,11 @@ class model
     vector<float> discharge()
     {
         vector<float> output;
-        for(neuron& n : structure.back()) { output.push_back(n.discharge()); } // print(output);
-        return output;
+        for(neuron* n : structure.back()) { output.push_back(n->discharge()); } // cout << "\noutput :"; print(output); cout << endl;
+        return functions::softmax(output);
     }
     
-    // backprop -----
-    
-    // read with model::train()
+    // backprop
     
     vector<float> getLoss(vector<float>& output, vector<float>& expected)
     {
@@ -124,14 +174,9 @@ class model
         return loss;
     }
     
-    vector<float> getLastLoss()
-    {
-        vector<float> loss;
-        for(neuron& n : structure.front()) { loss.push_back(n.lastLoss); } // print(output);
-        return loss;
-    }
-    
     // processing -----
+    
+    vector<float> preprocess(int index) { preprocess({index}); }
     
     vector<float> preprocess(vector<int> indexes) // indexes > charges | creates a float vector and charges indexes with charge "1".
     {

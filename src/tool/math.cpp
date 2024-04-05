@@ -2,15 +2,9 @@
 
 // ----- random ----- //
 
-#include <stdlib.h> // rand()
-#include <time.h>   // time(NULL)
+
 #include <cmath>    // exp()
 #include <random>   // random device
-
-void seedRandom()
-{
-    srand(time(NULL));
-}
 
 int random_int(int depth = 1000)
 {
@@ -24,12 +18,6 @@ float random_float(int depth = 1000)
 {
     return (double) random_int(depth) / depth;
 }
-
-/*
-float random_float(int depth = 1000)
-{
-    return (double) (rand() % depth) / depth;
-}*/
 
 float roundm(float n, float multiple = 0.01)
 {
