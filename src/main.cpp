@@ -52,13 +52,12 @@ dataset getData(string type = "test") // "test" or "train"
     return { inputs, expected };
 }
 
-/*
 
 int main()
 {
     // import CSV
     
-    vars::maxDatasetSize = 60000; // limits dataset import, 60,000 is huge dataset and takes time, so I limit for testing purpose
+    vars::maxDatasetSize = 10000; // limits dataset import, 60,000 is huge dataset and takes time, so I limit for testing purpose
     dataset dst = getData("train"); // imports CSV
     vector<vector<float>>& inputs = dst.inputs;
     vector<int>& expected = dst.expected;
@@ -71,6 +70,7 @@ int main()
     
     vars::biasPlasticity = 0.001; // 0.001
     vars::plasticity = 0.01;
+    vars::dropout = 0; // disabled
     vars::batchSize = 1;
     vars::epoch = 1;
     
@@ -150,8 +150,8 @@ int main00() // average train speed 50% optimal on (10 class & 20 samples)
     
     for(int z = 0; z < 1; z++)
     {
-        // model m(iSize, hSize, oSize);
-        model m(new layer(iSize, "vanilla"), {new layer(hSize, "lstm")}, new layer(oSize,"vanilla"));
+        model m(iSize, hSize, oSize);
+        // model m(new layer(iSize, "vanilla"), {new layer(hSize, "lstm")}, new layer(oSize,"vanilla"));
         
         int fail = 0; int count = 0;
         
@@ -190,6 +190,6 @@ int main00() // average train speed 50% optimal on (10 class & 20 samples)
     }
     
     cout << endl << "fail count :" << fail << endl;
-    -/
-} 
-*/
+    */
+}
+

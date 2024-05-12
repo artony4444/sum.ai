@@ -146,7 +146,9 @@ class model
     
     void fire()
     {
-        for(int l = 0; l < structure.size(); l++)
+        bool lastLayer = structure[1][0]->getType() == "vanilla" ? 1 : 0;
+        
+        for(int l = 0; l < structure.size() - lastLayer; l++)
         {
             for(int i = 0; i < structure[l].size(); i++)
             {

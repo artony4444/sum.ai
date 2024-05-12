@@ -6,6 +6,7 @@ struct vars
 {
     inline static float plasticity = 1.0;
     inline static float biasPlasticity = 1.0;
+    inline static float dropout = 0.001;
     inline static int batchSize = 1;
     inline static int epoch = 1;
     inline static int maxDatasetSize = 60000;
