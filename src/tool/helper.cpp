@@ -11,6 +11,7 @@ void printInput(vector<float> input)
     cout << endl << endl << endl;
 }
 
+/*
 vector<float> getWsum(model m)
 {
     vector<float> val;
@@ -53,3 +54,5 @@ vector<float> getWsum(cnn& m)
     }
     return val;
 }
+
+*/

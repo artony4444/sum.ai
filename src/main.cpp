@@ -10,6 +10,7 @@ using namespace std;
 #include "model/vanilla.cpp"
 #include "model/lstm/lstm_cell.cpp"
 #include "model/model.cpp"
+#include "tool/helper.cpp"
 
 #include <fstream>
 #include <filesystem>
@@ -91,7 +92,7 @@ int main()
                 accuracyV.erase(accuracyV.begin()); accuracyV.push_back(pass*100);
                 int accuracy = (int)(summ(accuracyV) / accuracyStep); //(int)((1-((float)fail/count))*100);
                 cout << x << y << " " << accuracy << "% "; cout << i << " (" << e << " > " << out << ")" << (pass ? " PASS" : " ") << endl; // printf("\33[2K\r"); cout << x << y << " " << accuracy << "% "; cout << i << " (" << e << " > " << out << ")" << (pass ? " PASS" : " ") << flush;
-                // printInput(inputs[i]); // show image
+                /* SHOW IMAGE */ // printInput(inputs[i]); // show image
                 // printInput(getWsum(m));
                 // printInput(m.getLastLoss());
             }
