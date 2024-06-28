@@ -1,4 +1,4 @@
-# (Σ) sum ai
+# basic ANN
 > Contact me -<br> [artony4444@gmail.com](mailto:artony4444@gmail.com)
 
 
